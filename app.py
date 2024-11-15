@@ -6,7 +6,7 @@ import google.generativeai as genai
 app = Flask(__name__)
 
 # Directly configure API key for Google Generative AI
-api_key = "AIzaSyA1K66Ev9ruG8yj462G5xD6RSj34Q0QVNk" 
+api_key = "AIzaSyA1K66Ev9ruG8yj462G5xD6RSj34Q0QVNk"  # Replace with your actual API key
 genai.configure(api_key=api_key)
 
 # Create the model
@@ -44,6 +44,6 @@ def ask():
     return jsonify({'response': response.text})
 
 if __name__ == '__main__':
-    # Use environment variable for dynamic port (e.g., Heroku) with a fallback to 5000 for local
+    # Use environment variable for dynamic port (e.g., Render) with a fallback to 5000 for local
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=True, host='0.0.0.0', port=port)
