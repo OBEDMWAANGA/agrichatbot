@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zambia University of Technology Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: rgb(255, 255, 255);
+            margin: 0;
+        }
+        #chat-container {
+            margin-top: 20px;
+            width: 80%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            background-color: #f4f4f9;
+            padding: 15px;
+            border-radius: 10px;
+            overflow-y: auto;
+            height: 400px;
+        }
+        .chat-message {
+            margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 5px;
+            width: fit-content;
+            max-width: 70%;
+        }
+        .user-message {
+            color: #fff;
+            background-color: lightblue;
+            align-self: flex-end;
+        }
+        .bot-message {
+            background-color: lightgrey;
+            color: #000;
+            align-self: flex-start;
+        }
+        .chat-form {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        #message {
+            width: 80%;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            width: 15%;
+            padding: 10px;
+            background-color: blue;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: darkblue;
+        }
+        .typing-indicator {
+            font-style: italic;
+            color: grey;
+            margin-bottom: 10px;
+        }
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-message.bot-message.typing {
+            font-style: italic;
+            color: grey;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h1 style="text-align: center;">Agriculture Chatbot</h1>
+        <div id="chat-container" class="chat-container"></div>
+
+        <div style="margin-top: 20px;
+        width: 80%;
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+        background-color: #f4f4f9;
+        padding: 15px;
+        border-radius: 10px;
+        overflow-y: auto;">
+            <form  id="chat-form" class="chat-form">
+            <input type="text" id="message" placeholder="Ask a question..." required>
+            <button type="submit">Send</button>
+        </form>
+        </div>
+        
+    </div>
+
+    <script>
+        document.getElementById('chat-form').onsubmit = function(event) {
+            event.preventDefault();
+
+            let message = document.getElementById('message').value;
+            document.getElementById('message').value = '';
+
+            let chatContainer = document.getElementById('chat-container');
+            chatContainer.innerHTML += `<div class="chat-message user-message">You: ${message}</div>`;
+
+            // Show typing indicator
+            chatContainer.innerHTML += `<div class="chat-message bot-message typing">Bot: Typing...</div>`;
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            setTimeout(() => {
+                fetch('/ask', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'message=' + encodeURIComponent(message)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Remove typing indicator and show bot response
+                    let typingIndicator = document.querySelector('.typing');
+                    typingIndicator && typingIndicator.remove();
+                    chatContainer.innerHTML += `<div class="chat-message bot-message">Bot: ${data.response}</div>`;
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    let typingIndicator = document.querySelector('.typing');
+                    typingIndicator && typingIndicator.remove();
+                    chatContainer.innerHTML += `<div class="chat-message bot-message">Bot: Sorry, something went wrong.</div>`;
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                });
+            }, 2000); // Simulate delay for "typing..."
+        };
+    </script>
+</body>
+</html>
